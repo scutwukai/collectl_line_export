@@ -2,6 +2,7 @@ use bytes;
 use LWP::UserAgent;
 use HTTP::Request;
 
+my $hostname='';
 my $influxdbSockHost;
 my $influxdbSockPort;
 my $influxdbWriteDB='';
@@ -29,24 +30,27 @@ sub influxdbInit {
     $hostport      .= ":8086"    if $hostport!~/:/;
     $influxdbDebug  = 0;
 
+    if ($hostname eq '') {
+        $hostname = `hostname`;
+        chomp $hostname;
+    }
+
     # parsing
     ($influxdbSockHost, $influxdbSockPort)=split(/:/, $hostport);
 
     foreach my $option (@_) {
         my ($name, $value)=split(/=/, $option);
-        error("invalid influxdb option '$name'")    if $name!~/^[dw]?$/;
+        error("invalid influxdb option '$name'")    if $name!~/^[dwh]?$/;
 
         $influxdbDebug=$value       if $name eq 'd';
         $influxdbWriteDB=$value     if $name eq 'w';
+        $hostname=$value            if $name eq 'h';
     }
 
     error("the influxdb database name must be spec")    if $influxdbWriteDB eq '';
 }
 
 sub influxdb {
-    my $hostname = `hostname`;
-    chomp $hostname;
-
     $influxdbTimestamp = time;
     $influxdbTags      = "host=$hostname";
     @influxdbHttpBuf   = ();
