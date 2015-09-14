@@ -6,6 +6,7 @@ my $hostname='';
 my $influxdbSockHost;
 my $influxdbSockPort;
 my $influxdbWriteDB='';
+my $influxdbUseRP='default';
 my $influxdbDebug;
 
 my $influxdbTags;
@@ -40,10 +41,11 @@ sub influxdbInit {
 
     foreach my $option (@_) {
         my ($name, $value)=split(/=/, $option);
-        error("invalid influxdb option '$name'")    if $name!~/^[dwh]?$/;
+        error("invalid influxdb option '$name'")    if $name!~/^[dwhr]?$/;
 
         $influxdbDebug=$value       if $name eq 'd';
         $influxdbWriteDB=$value     if $name eq 'w';
+        $influxdbUseRP=$value       if $name eq 'r';
         $hostname=$value            if $name eq 'h';
     }
 
@@ -132,7 +134,7 @@ sub sendData {
         return;
     }
 
-    my $request = new HTTP::Request 'POST', "http://$influxdbSockHost:$influxdbSockPort/write?db=$influxdbWriteDB&precision=s";
+    my $request = new HTTP::Request 'POST', "http://$influxdbSockHost:$influxdbSockPort/write?db=$influxdbWriteDB&precision=s&rp=$influxdbUseRP";
     $request->header('content-length' => bytes::length($content));
     $request->header('content-type' => 'text/plain');
     $request->content($content);
