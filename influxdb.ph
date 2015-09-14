@@ -87,6 +87,16 @@ sub influxdb {
         bufData();
     }
 
+    if ($subsys=~/d/)
+    {
+        newData('disktotals');
+        addData('reads',    'reads/sec',    $dskReadTot/$intSecs);
+        addData('readkbs',  'readkbs/sec',  $dskReadKBTot/$intSecs);
+        addData('writes',   'writes/sec',   $dskWriteTot/$intSecs);
+        addData('writekbs', 'writekbs/sec', $dskWriteKBTot/$intSecs);
+        bufData();
+    }
+
     sendData()
 }
 
