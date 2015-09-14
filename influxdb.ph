@@ -23,10 +23,6 @@ sub influxdbInit {
     my $hostport=shift;
     error("host[:port] must be specified as first parameter")    if !defined($hostport);
 
-    # Just like vmstat
-    error("-f requires either --rawtoo or -P")     if $filename ne '' && !$rawtooFlag && !$plotFlag;
-    error("-P or --rawtoo require -f")             if $filename eq '' && ($rawtooFlag || $plotFlag);
-
     # parameter defaults
     $hostport      .= ":8086"    if $hostport!~/:/;
     $influxdbDebug  = 0;
